@@ -41,7 +41,7 @@ class Program
         }
         else
         {
-            Console.WriteLine("Better luck next time chump");
+            Console.WriteLine("Looks like you didn't pass the class. That's ok! Schedule an appointment with an advisor, and we hope to see you back next semester!");
         }
 
     }
