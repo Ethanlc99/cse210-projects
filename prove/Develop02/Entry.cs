@@ -22,19 +22,28 @@ class Entry
     }
 
     // Saves entry to journal
-    public void SaveEntry(string _fileName, string _newEntry)
+    public void SaveEntry(string _fileName, List<string> _currentEntries)
     {
-        string _entry = $"{_newEntry}";
+        List<string> entries = _currentEntries;
         // Check if directory exists, and creates it if it doesn't, then saves entry to that text file
         string dir = $@"C:\Journal\{_fileName}\Entry.txt";
         if (Directory.Exists(dir))
         { 
-            File.WriteAllText(Path.Combine($@"C:\Journal\{_fileName}", "Entry.txt"), _entry);
+            foreach (string entry in entries)
+            {
+            StreamWriter sw = new StreamWriter(Path.Combine(dir), true);
+            sw.WriteLine(entry);
+            sw.Close();
+            }
+            // File.WriteAllText(Path.Combine($@"C:\Journal\{_fileName}", "Entry.txt"), _entry);
         }
         else
         {
             Directory.CreateDirectory($@"C:\Journal\{_fileName}");
-            File.AppendAllText(Path.Combine(dir), _entry);
+            foreach (string entry in entries)
+            {
+            File.AppendAllText(Path.Combine(dir), entry);
+            }
         }
 
         

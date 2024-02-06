@@ -10,7 +10,7 @@ class Program
         Journal journal1 = new Journal();
         PromptGenerator prompt1 = new PromptGenerator();
 
-        string userChoice = "1";
+        string userChoice = "0";
 
         // Display menu and take inputs until the user chooses to quit
         while (userChoice !="5")
@@ -46,14 +46,14 @@ class Program
                     Console.WriteLine("Load");
                     Console.WriteLine("What file would you like to load?");
                     string filename = Console.ReadLine();
-                    Console.WriteLine($"{journal1.LoadEntry(filename)}");
+                    journal1.LoadEntry(filename);
                     break;
                 // Save entry
                 case "4":
                     Console.WriteLine("Save");
                     Console.WriteLine("Enter the name the of file in which you would like to save your jounral entry to");
                     entry1._fileName = Console.ReadLine();
-                    entry1.SaveEntry(entry1._fileName, entry1._newEntry);
+                    entry1.SaveEntry(entry1._fileName, journal1._currentEntries);
                     journal1._saved = 0;
                     break;
                 // Quit

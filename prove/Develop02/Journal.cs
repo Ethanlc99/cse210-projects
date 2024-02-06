@@ -7,11 +7,20 @@ class Journal{
     public int _saved;
 
     // Reads file chosen by user and returns the contents as a string
-    public string LoadEntry(string _fileName)
+    public List<string> LoadEntry(string _fileName)
     {
-        string dir = $@"C:\Journal\{_fileName}";
-        string entry = File.ReadAllText(dir + "\\Entry.txt");
-        return entry;
+        string dir = $@"C:\Journal\{_fileName}\\Entry.txt";
+
+        using (StreamReader sr = new StreamReader(dir))
+        {
+            string line;
+            while ((line = sr.ReadLine()) != null)
+            {
+                _currentEntries.Add(line);
+            }
+        }
+        
+        return _currentEntries;
     }
 
 }
