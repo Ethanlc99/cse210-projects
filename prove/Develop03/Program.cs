@@ -20,18 +20,13 @@ class Program
 
         string verses = library.GetScripture(choice);
 
-
-        // foreach (string i in choice){
-        // Console.WriteLine($"{i}");}
-        // Console.WriteLine(choice.Count);
-
+        //Checks if choice has one verse or multiple, and creates a Reference object based on that
         if (choice.Count == 3)
         {
             Reference ref1 = new Reference(choice[0], choice[1], choice[2]);
             string reference = ref1.GetReference();
             Word word1 = new Word();
             Scripture script1 = new Scripture(reference, verses);
-            // Console.WriteLine("Only one Verse");
             Run(word1, script1);
         }
         else if (choice.Count == 4)
@@ -40,14 +35,13 @@ class Program
             string reference = ref1.GetReference();
             Word word1 = new Word();
             Scripture script1 = new Scripture(reference, verses);
-            // Console.WriteLine("Multiple Verses");
             Run(word1, script1);            
         }
 
 
 
 
-
+        //Function that starts the game and slowly removes words from the scripture
         void Run( Word word, Scripture script)
         {
 
@@ -57,6 +51,7 @@ class Program
 
             word.SetWords(script.GetScripture());
 
+            //Slowly removes words until user types quit, or all words are blank
             while (userChoice != "quit")
             {
                 Console.WriteLine("Press enter to continue or type quit to exit.");

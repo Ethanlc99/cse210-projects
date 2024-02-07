@@ -3,13 +3,12 @@ using System.Text;
 
 class Scripture
 {
+    //Define Random for HideWords function
     Random rnd = new Random();
-
-    // private Dictionary<string, string> _scriptureDict = new Dictionary<string, string>();
     
+    //Define Member Variables
     private List<string> _currentScripture = new List<string>();
     private string _scriptureReference;
-
     private List<int> _hide = new List<int>();
 
     // Construct that stores reference and list of words
@@ -42,8 +41,6 @@ class Scripture
             }
             _hide.Add(randomNum);
         }
-        // hide[1] = rnd.Next(0, 10);
-        // hide[2] = rnd.Next(0, 10);
 
         foreach (int num in _hide)
         {
@@ -76,35 +73,3 @@ class Scripture
     }
 
 }
-
-
-
-
-
-
-
-
-    // private void MakeScriptureList(string scripture)
-    // {
-    //     string[] words = scripture.Split(" ");
-
-    //     foreach (string word in words)
-    //     {
-    //         _currentScripture.Add(word);
-    //     }
-    // }
-
-    // public string GetReference()
-    // {
-    //     return _scriptureReference;
-    // }
-
-    // public void SetScripture(string scripture)
-    // {
-    //     _scriptureDict.Add(_scriptureReference, scripture);
-    // }
-
-        // private void SetCurrentScripture(string scripture)
-    // {
-
-    // }

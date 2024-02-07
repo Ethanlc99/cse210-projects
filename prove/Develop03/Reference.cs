@@ -1,10 +1,12 @@
 class Reference
 {
+    //Define Member Variables
     private string _book = "";
     private string _chapter = "";
     private string _verse = "";
     private string _endVerse = "";
 
+    //Define Constructors
     public Reference(string book, string chapter, string verse)
     {
         _book = book;
@@ -35,15 +37,5 @@ class Reference
 
         return reference;
     }
-
-    // public void SetReference(string book, string chapter, string verse, string endVerse)
-    // {
-    //     _book = book;
-    //     _chapter = chapter;
-    //     _verse = verse;
-    //     _endVerse = endVerse;
-    // }
-
-
 
 }

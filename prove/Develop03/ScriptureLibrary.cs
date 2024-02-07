@@ -40,6 +40,7 @@ class ScriptureLibrary
     };
 
 
+    // Gets scripture from dictionary, based on key provided
     public string GetScripture(List<string> key)
     {
     string value = null;
