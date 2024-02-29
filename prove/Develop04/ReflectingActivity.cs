@@ -71,10 +71,22 @@ class ReflectingActivity : Activity
 
 //METHODS
 
-    public void SetPrompt()
+    public bool SetPrompt()
     {
-        int index = new Random().Next(_prompts.Count);
-        _prompt = _prompts[index];
+        if (_prompts.Count == 0)
+        {
+            Console.WriteLine("Sorry, there are no more prompts for this activity. Please try again later.");
+            DisplaySpinner(5);
+            Console.Clear();
+            return false;
+        }
+        else
+        {
+            int index = new Random().Next(_prompts.Count);
+            _prompt = _prompts[index];
+            _prompts.RemoveAt(index);
+            return true;
+        }
     }
 
     public void DisplayPrompt()
@@ -88,6 +100,7 @@ class ReflectingActivity : Activity
     {
         int index = new Random().Next(_questions.Count);
         _question = _questions[index];
+        _questions.RemoveAt(index);
     }
     public void DisplayQuestion(int time)
     {

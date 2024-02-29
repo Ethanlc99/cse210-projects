@@ -27,15 +27,28 @@ class ListingActivity : Activity
             "List things you're excited about today:",
             "List things you can do to relax and unwind:",
             "List things you're grateful for in your relationships:",
-            "List things that make you feel grounded:"};
+            "List things that make you feel grounded:"
+            };
 
 //METHODS
 
      // Sets _prompt to a random prompt from the _prompts list
-     public void SetPrompt()
+     public bool SetPrompt()
      {
+         if (_prompts.Count == 0)
+         {
+            Console.WriteLine("Sorry, there are no more prompts for this activity. Please try again later.");
+            DisplaySpinner(5);
+            Console.Clear();
+            return false;
+         }
+         else
+         {
          int index = new Random().Next(_prompts.Count);
          _prompt = _prompts[index];
+         _prompts.RemoveAt(index);
+         return true;
+         }
      }
 
      public string GetPrompt()

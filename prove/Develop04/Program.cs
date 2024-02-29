@@ -32,11 +32,14 @@ class Program
                     break;
                 case 2:
                     ReflectingActivity activity2 = new ReflectingActivity();
+                    if (activity2.SetPrompt() == false)
+                    {
+                        break;
+                    }
                     activity2.SetName("Reflecting");
                     activity2.DisplayStartMessage();
                     activity2.DisplayInfo();
                     activity2.SetDuration();
-                    activity2.SetPrompt();
                     activity2.SetQuestion();
                     activity2.DisplayGetReady();
                     activity2.DisplayPrompt();
@@ -45,11 +48,14 @@ class Program
                     break;
                 case 3:
                     ListingActivity activity3 = new ListingActivity();
+                    if (activity3.SetPrompt() == false)
+                    {
+                        break;
+                    }
                     activity3.SetName("Listing");
                     activity3.DisplayStartMessage();
                     activity3.DisplayInfo();
                     activity3.SetDuration();
-                    activity3.SetPrompt();
                     activity3.DisplayGetReady();
                     activity3.DisplayPrompt();
                     activity3.GetResponses(activity3.GetDuration());
