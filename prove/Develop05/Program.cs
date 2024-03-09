@@ -108,8 +108,6 @@ class Program
                         }
                         foreach (Goal goal in _goalList)
                         {
-                            Console.WriteLine(goal);
-                            DisplaySpinner(1);
                             goal.SaveGoal(filename);
                         }
                         break;
