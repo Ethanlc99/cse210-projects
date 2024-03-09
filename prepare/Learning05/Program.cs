@@ -15,6 +15,7 @@ class Program
             Console.WriteLine(shape.GetColor());
             Console.WriteLine(shape.GetArea());
             Console.WriteLine();
+            // shape.Celebrate();
         }
 
     }
