@@ -3,7 +3,7 @@ using System.Diagnostics;
 
 
 
-// Add feature that allows you to connect sources and elements to each other, and calculate values. 
+// Add feature that add connected sources to elementConnections Dictionary, and calculates values. 
 // Future : Add feature that shows circuit in schematic form.
 
 
@@ -213,7 +213,46 @@ class Program
                     break;
 
 
-                case 4:
+                case 4: // Connect elements and sources
+                    DisplayElements();
+                    Console.Write("Choose the first element you would like to connect: ");
+                    int element1 = int.Parse(Console.ReadLine());
+                    Console.Write($"Choose the element you would like to connect to {elementList[element1-1].GetName()}: ");
+                    int element2 = int.Parse(Console.ReadLine());
+
+                    string typeElement1 = elementList[element1-1].GetElementType();
+                    string typeElement2 = elementList[element2-1].GetElementType();
+
+                    if (typeElement1 == "AC Voltage Source" || typeElement1 == "DC Voltage Source" || typeElement1 == "AC Current Source" || typeElement1 == "DC Current Source")
+                    {
+                        Console.Write($"Are you connecting the positive terminal of {elementList[element1-1].GetName()} to {elementList[element2-1].GetName()}?: ");
+                        string positiveTerminal = Console.ReadLine();
+                        if (positiveTerminal == "y" || positiveTerminal == "Y")
+                        {
+                            elementList[element1-1].SetPositiveTerminal(true);
+                        }
+                        else
+                        {
+                            elementList[element1-1].SetPositiveTerminal(false);
+                        }
+                    }
+
+                    if (typeElement2 == "AC Voltage Source" || typeElement2 == "DC Voltage Source" || typeElement2 == "AC Current Source" || typeElement2 == "DC Current Source")
+                    {
+                        Console.Write($"Are you connecting the positive terminal of {elementList[element2-1].GetName()} to {elementList[element1-1].GetName()}?: ");
+                        string positiveTerminal = Console.ReadLine();
+                        if (positiveTerminal == "y" || positiveTerminal == "Y")
+                        {
+                            elementList[element2-1].SetPositiveTerminal(true);
+                        }
+                        else
+                        {
+                            elementList[element2-1].SetPositiveTerminal(false);
+                        }
+                    }
+
+
+
                     Console.WriteLine("Connect Elements and Sources");
                     break;
 
@@ -243,6 +282,7 @@ class Program
         void DisplayElements()
         {   
             List<Element> sortedList = elementList.OrderBy(o=>o.GetElementType()).ToList();
+            elementList = sortedList;
             int counter = 1;
             foreach (Element element in sortedList)
             {

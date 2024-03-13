@@ -11,4 +11,6 @@ public class Capacitor : Element
     {
         Console.WriteLine($"{_Type}: {_name} ({_value} F)");
     }
+
+    public override void SetPositiveTerminal(bool positiveTerminal){}
 }

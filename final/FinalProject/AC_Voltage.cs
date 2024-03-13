@@ -11,6 +11,6 @@ public class AC_Voltage : Voltage
     // Methods
     public override void DisplayElement()
     {
-        Console.WriteLine($"{_elementType}: {_name} ({_voltage} V, {_phaseAngle} degrees)");
+        Console.WriteLine($"{_elementType}: {_name} ({_voltage} V, {_phaseAngle} degrees) {_positiveTerminal}");
     }
 }

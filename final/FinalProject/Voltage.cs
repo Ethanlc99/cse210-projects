@@ -1,8 +1,7 @@
 public abstract class Voltage : Element
 {
     // Member Variables
-    protected bool _positiveTerminal = true;
-    protected bool _negativeTerminal = false;
+    protected bool _positiveTerminal;
     protected string _elementType;
     
     // Constructors
@@ -15,5 +14,16 @@ public abstract class Voltage : Element
 
     // Methods
     public override abstract void DisplayElement();
+
+
+    public override void SetPositiveTerminal(bool positiveTerminal)
+    {
+        _positiveTerminal = positiveTerminal;
+    }
+
+    public override string GetElementType()
+    {
+        return _elementType;
+    }
 
 }

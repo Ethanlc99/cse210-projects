@@ -5,6 +5,7 @@ public class Resistor : Element{
     {
         _realResistance = realResistance;
         _Type = "Resistor";
+        _imaginaryResistance = 0;
     }
 
 
@@ -13,5 +14,5 @@ public class Resistor : Element{
         Console.WriteLine($"{_Type}: {_name} ({_realResistance} ohms)");
     }
 
-
+    public override void SetPositiveTerminal(bool positiveTerminal){}
 }

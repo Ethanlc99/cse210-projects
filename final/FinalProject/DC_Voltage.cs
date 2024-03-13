@@ -4,6 +4,7 @@ public class DC_Voltage : Voltage
     public DC_Voltage(string name, int voltage) : base(name, voltage)
     {
         _elementType = "DC Voltage Source";
+        _phaseAngle = 0;
     }
 
     // Methods

@@ -11,4 +11,6 @@ public class Inductor : Element
     {
         Console.WriteLine($"{_Type}: {_name} ({_value} H)");
     }
+
+        public override void SetPositiveTerminal(bool positiveTerminal){}
 }

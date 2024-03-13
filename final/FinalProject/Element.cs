@@ -86,10 +86,12 @@ public abstract class Element
     {
         _Type = type;
     }
-    public string GetElementType()
+    public virtual string GetElementType()
     {
         return _Type;
     }
+
+    public abstract void SetPositiveTerminal(bool positiveTerminal);
 
     // Methods
     public abstract void DisplayElement();

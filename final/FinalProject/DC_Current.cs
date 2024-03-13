@@ -4,6 +4,7 @@ public class DC_Current : Current
     public DC_Current(string name, int current) : base(name, current)
     {
         _elementType = "DC Current Source";
+        _phaseAngle = 0;
     }
 
     // Methods
