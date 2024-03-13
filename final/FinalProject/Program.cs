@@ -3,7 +3,8 @@ using System.Diagnostics;
 
 
 
-// Reformat everything so that element only has value, not resistance. Leave getting and setting resistance to the different class. Also have resistance and imaginary resistance be a string that way we can pull it from the dict and use for calculations later
+// Add feature that allows you to connect sources and elements to each other, and calculate values. 
+// Future : Add feature that shows circuit in schematic form.
 
 
 
