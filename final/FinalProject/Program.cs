@@ -3,7 +3,7 @@ using System.Diagnostics;
 
 
 
-// Add feature that add connected sources to elementConnections Dictionary, and calculates values. 
+// TODO: Add feature to case 4 that allows user to add element to existing connection. Add feature that calculates values (Thevinin and Norton, parrallel impedance). 
 // Future : Add feature that shows circuit in schematic form.
 
 
@@ -12,24 +12,45 @@ class Program
 {
     static void Main(string[] args)
     {
+        // Variables
         DateTime _startSpinner;
         DateTime _endSpinner;
         int userChoice1 = 0;
         int _frequency = 0;
+        bool _frequencySet = false;
+
 
         // Dict that hold values a such: 
         // string Element_ConnectedElement : 
         // ([string ElementName, int (Value of Voltage Current or real Resistance], int [Value of Voltage or Current Phase Shift or imaginary part of resistance/impedance], bool [true if positive terminal, false if negative terminal, null if n/a]), 
-        // (string ElementName, int [Value of Voltage Current or real Resistance], int [Value of Voltage or Current Phase Shift or imaginary part of resistance/impedance], bool [true if positive terminal, false if negative terminal, null if n/a])))
-        Dictionary<string, Tuple<Tuple<string, int, int, bool>, Tuple<string, int, int, bool>>> elementConnections = new Dictionary<string, Tuple<Tuple<string, int, int, bool>, Tuple<string, int, int, bool>>>();
+        Dictionary<string, List<Tuple<string, float, float, bool?>>> elementConnections = new Dictionary<string, List<Tuple<string, float, float, bool?>>>();
 
         List<Element> elementList = new List<Element>();
+        
+        
+        
+        // Test Elements
+        DC_Voltage test_dC_Voltage = new DC_Voltage("V1", 5);
+        Resistor test_resistor = new Resistor("R1", 1000);
+        DC_Current test_dC_Current = new DC_Current("C1", 5);
+        Resistor test_resistor2 = new Resistor("R2", 1000);
+
+        elementList.Add(test_dC_Voltage);
+        elementList.Add(test_resistor);
+        elementList.Add(test_dC_Current);
+        elementList.Add(test_resistor2);
+        
+        
+        
+        
+        
+        
         // Main Menu
         while (userChoice1 != 7)
         {
             // DisplayElements();
             Console.WriteLine("Menu Options:");
-            Console.WriteLine("1. View All Elements");
+            Console.WriteLine("1. View All Elements/Connections");
             Console.WriteLine("2. Add Source");
             Console.WriteLine("3. Add Element");
             Console.WriteLine("4. Connect Elements and Sources");
@@ -50,9 +71,47 @@ class Program
 
             switch(userChoice1)
             {
-                case 1: 
-                    Console.WriteLine("View All Elements");
-                    DisplayElements();
+                case 1: // Shows all elements in elementList
+                    int userChoiceView = 0;
+                    bool viewElements = false;
+                    while (!viewElements)
+                    {
+                        Console.WriteLine("1. View All Elements \n2. View All Connections \n3. Back to Main Menu");
+                        Console.Write("Which would you like to see?: ");
+                        try
+                        {
+                            userChoiceView = int.Parse(Console.ReadLine());
+                            }
+                            catch
+                            {
+                                Console.WriteLine("Please enter a number between 1 and 3");
+                                // DisplaySpinner(5);
+                                userChoiceView = 0;
+                            }
+                        switch (userChoiceView)
+                        {
+                            case 1:
+                                Console.Clear();
+                                DisplayElements();
+                                viewElements = true;
+                                // DisplaySpinner(5);
+                                break;
+                            case 2:
+                                Console.Clear();
+                                DisplayConnections(existingConnection: null);
+                                viewElements = true;
+                                // DisplaySpinner(5);
+                                break;
+                            case 3:
+                                viewElements = true;
+                                break;
+                            default:
+                                Console.WriteLine("Please enter a number between 1 and 2");
+                                userChoiceView = 0;
+                                // DisplaySpinner(5);
+                                break;
+                        }
+                    }
                     break;
 
 
@@ -85,7 +144,7 @@ class Program
                             Console.Write("What would you like to name your Voltage Source?: ");
                             string voltageName = Console.ReadLine();
                             Console.Write("What is the value of the Voltage Source in Volts?: ");
-                            int voltageValue = int.Parse(Console.ReadLine());
+                            float voltageValue = float.Parse(Console.ReadLine());
                             DC_Voltage voltageSource = new DC_Voltage(voltageName, voltageValue);
                             elementList.Add(voltageSource);
                             voltageSource.DisplayElement();
@@ -96,7 +155,7 @@ class Program
                             Console.Write("What would you like to name your Current Source?: ");
                             string currentName = Console.ReadLine();
                             Console.Write("What is the value of the Current Source in Amps?: ");
-                            int currentValue = int.Parse(Console.ReadLine());
+                            float currentValue = float.Parse(Console.ReadLine());
                             DC_Current currentSource = new DC_Current(currentName, currentValue);
                             elementList.Add(currentSource);
                             currentSource.DisplayElement();
@@ -104,24 +163,26 @@ class Program
                             Console.WriteLine("Current Source Added");
                             break;
                         case 3: // AC Voltage
+                            SetFrequency();
                             Console.WriteLine("What would you like to name your Voltage Source?: ");
                             string voltageName2 = Console.ReadLine();
                             Console.WriteLine("What is the amplitude of the Voltage Source in Volts?: ");
-                            int voltageValue2 = int.Parse(Console.ReadLine());
+                            float voltageValue2 = float.Parse(Console.ReadLine());
                             Console.WriteLine("What is the phase angle of the Voltage Source in degrees?: ");
-                            int phaseAngle = int.Parse(Console.ReadLine());
+                            float phaseAngle = float.Parse(Console.ReadLine());
                             AC_Voltage voltageSource2 = new AC_Voltage(voltageName2, voltageValue2, phaseAngle);
                             elementList.Add(voltageSource2);
                             voltageSource2.DisplayElement();
                             sourceAdded = true;
                             break;
                         case 4: // AC Current
+                            SetFrequency();
                             Console.WriteLine("What would you like to name your Current Source?: ");
                             string currentName2 = Console.ReadLine();
                             Console.WriteLine("What is the amplitude of the Current Source in Amps?: ");
-                            int currentValue2 = int.Parse(Console.ReadLine());
+                            float currentValue2 = float.Parse(Console.ReadLine());
                             Console.WriteLine("What is the phase angle of the Current Source in degrees?: ");
-                            int phaseAngle2 = int.Parse(Console.ReadLine());
+                            float phaseAngle2 = float.Parse(Console.ReadLine());
                             AC_Current currentSource2 = new AC_Current(currentName2, currentValue2, phaseAngle2);
                             elementList.Add(currentSource2);
                             currentSource2.DisplayElement();
@@ -166,34 +227,38 @@ class Program
                         switch(userChoice2)
                         {
 
-                            case 1:
+                            case 1: // Adding Resistor
                                 Console.Write("What would you like to name your Resistor?: ");
                                 string resistorName = Console.ReadLine();
                                 Console.Write("What is the resistance of your resistor in Ohms?: ");
-                                int resistorValue = int.Parse(Console.ReadLine());
+                                float resistorValue = float.Parse(Console.ReadLine());
                                 Resistor resistor = new Resistor(resistorName, resistorValue);
                                 elementList.Add(resistor);
                                 resistor.DisplayElement();
                                 elementAdded = true;
                                 Console.WriteLine("Resistor Added");
                                 break;
-                            case 2:
+                            case 2: // Adding Inductor
+                                SetFrequency();
                                 Console.Write("What would you like to name your Inductor?: ");
                                 string inductorName = Console.ReadLine();
                                 Console.Write("What is the value of the Inductor in Henrys?: ");
-                                int inductorValue = int.Parse(Console.ReadLine());
-                                Inductor inductor = new Inductor(inductorName, inductorValue);
+                                float inductorValue = float.Parse(Console.ReadLine());
+                                Inductor inductor = new Inductor(inductorName, inductorValue, _frequency);
+                                // inductor.SetImpedance(_frequency);
                                 elementList.Add(inductor);
                                 inductor.DisplayElement();
                                 Console.WriteLine("Inductor Added");
                                 elementAdded = true;
                                 break;
-                            case 3:
+                            case 3: // Adding Capacitor
+                                SetFrequency();
                                 Console.Write("What would you like to name your Capacitor?: ");
                                 string capacitorName = Console.ReadLine();
                                 Console.Write("What is the value of the Capacitor in Farads?: ");
-                                int capacitorValue = int.Parse(Console.ReadLine());
-                                Capacitor capacitor = new Capacitor(capacitorName, capacitorValue);
+                                float capacitorValue = float.Parse(Console.ReadLine());
+                                Capacitor capacitor = new Capacitor(capacitorName, capacitorValue, _frequency);
+                                // capacitor.SetImpedance(_frequency);
                                 elementList.Add(capacitor);
                                 capacitor.DisplayElement();
                                 Console.WriteLine("Capacitor Added");
@@ -215,49 +280,143 @@ class Program
 
                 case 4: // Connect elements and sources
                     DisplayElements();
-                    Console.Write("Choose the first element you would like to connect: ");
-                    int element1 = int.Parse(Console.ReadLine());
-                    Console.Write($"Choose the element you would like to connect to {elementList[element1-1].GetName()}: ");
-                    int element2 = int.Parse(Console.ReadLine());
-
-                    string typeElement1 = elementList[element1-1].GetElementType();
-                    string typeElement2 = elementList[element2-1].GetElementType();
-
-                    if (typeElement1 == "AC Voltage Source" || typeElement1 == "DC Voltage Source" || typeElement1 == "AC Current Source" || typeElement1 == "DC Current Source")
+                    DisplayConnections(existingConnection: null);
+                    bool pass = false;
+                    int userChoiceConnecting = 0;
+                    while(!pass)
                     {
-                        Console.Write($"Are you connecting the positive terminal of {elementList[element1-1].GetName()} to {elementList[element2-1].GetName()}?: ");
-                        string positiveTerminal = Console.ReadLine();
-                        if (positiveTerminal == "y" || positiveTerminal == "Y")
+                    Console.Write("Options: \n1. Adding a new Connection \n2. Adding to an existing Connection \n3. Return to Main Menu \nWhich would you like to do?: ");
+                    try
+                    {
+                        userChoiceConnecting = int.Parse(Console.ReadLine());
+                        pass = true;
+                    }
+                    catch
+                    {   
+                        Console.Clear();
+                        Console.WriteLine("Please enter a number between 1 and 3");
+                        // DisplaySpinner(5);
+                        userChoiceConnecting = 0;
+                    }
+                    }
+
+
+
+                    if (userChoiceConnecting == 1)
+                    {
+                        Console.Write("Choose the first element you would like to connect: ");
+                        int element1 = int.Parse(Console.ReadLine());
+                        Console.Write($"Choose the element you would like to connect to {elementList[element1-1].GetName()}: ");
+                        int element2 = int.Parse(Console.ReadLine());
+                        
+                        // Makes sure that user doesn't connect an element to itself
+                        if (element1 == element2)
                         {
-                            elementList[element1-1].SetPositiveTerminal(true);
+                            Console.Clear();
+                            Console.WriteLine("Sorry, this program does not permit connecting an element to itself");
+                            break;
+                        }
+                        string typeElement1 = elementList[element1-1].GetElementType();
+                        string typeElement2 = elementList[element2-1].GetElementType();
+                        bool element1IsSource = false;
+                        bool element2IsSource = false;
+
+                        if (typeElement1 == "AC Voltage Source" || typeElement1 == "DC Voltage Source" || typeElement1 == "AC Current Source" || typeElement1 == "DC Current Source")
+                        {
+                            Console.Write($"Are you connecting the positive terminal of {elementList[element1-1].GetName()} to {elementList[element2-1].GetName()}? [y/n]: ");
+                            string positiveTerminal = Console.ReadLine();
+                            if (positiveTerminal == "y" || positiveTerminal == "Y")
+                            {
+                                elementList[element1-1].SetPositiveTerminal(true);
+                            }
+                            else
+                            {
+                                elementList[element1-1].SetPositiveTerminal(false);
+                            }
+                        }
+
+                        if (typeElement2 == "AC Voltage Source" || typeElement2 == "DC Voltage Source" || typeElement2 == "AC Current Source" || typeElement2 == "DC Current Source")
+                        {
+                            Console.Write($"Are you connecting the positive terminal of {elementList[element2-1].GetName()} to {elementList[element1-1].GetName()}?: ");
+                            string positiveTerminal = Console.ReadLine();
+                            if (positiveTerminal == "y" || positiveTerminal == "Y")
+                            {
+                                elementList[element2-1].SetPositiveTerminal(true);
+                            }
+                            else
+                            {
+                                elementList[element2-1].SetPositiveTerminal(false);
+                            }
+                        }
+
+                        if (element1IsSource== true && element2IsSource == true)
+                        {
+                            ConnectSourceToSource(elementList[element1-1], elementList[element2-1]);
+                        }
+                        else if (element1IsSource == true && element2IsSource == false)
+                        {
+                            ConnectSourceToElement(elementList[element1-1], elementList[element2-1]);
+                        }
+                        else if (element1IsSource == false && element2IsSource == true)
+                        {
+                            ConnectSourceToElement(elementList[element2-1], elementList[element1-1]);
                         }
                         else
                         {
-                            elementList[element1-1].SetPositiveTerminal(false);
+                            ConnectElementToElement(elementList[element1-1], elementList[element2-1]);
                         }
                     }
-
-                    if (typeElement2 == "AC Voltage Source" || typeElement2 == "DC Voltage Source" || typeElement2 == "AC Current Source" || typeElement2 == "DC Current Source")
+                    else if (userChoiceConnecting == 2)
                     {
-                        Console.Write($"Are you connecting the positive terminal of {elementList[element2-1].GetName()} to {elementList[element1-1].GetName()}?: ");
-                        string positiveTerminal = Console.ReadLine();
-                        if (positiveTerminal == "y" || positiveTerminal == "Y")
-                        {
-                            elementList[element2-1].SetPositiveTerminal(true);
-                        }
-                        else
-                        {
-                            elementList[element2-1].SetPositiveTerminal(false);
-                        }
+                        // TODO: Add function that will allow user to connect a single element to an existing connection
                     }
-
 
 
                     Console.WriteLine("Connect Elements and Sources");
                     break;
 
 
-                case 5:
+                case 5: // Find Value
+                    Console.Clear();
+                    Console.WriteLine("Which element would you like to find the value of?");
+                    DisplayElements();
+                    int elementChoice = int.Parse(Console.ReadLine());
+                    string elementType = elementList[elementChoice-1].GetElementType();
+                    if (elementType == "Resistor" || elementType == "Inductor" || elementType == "Capacitor")
+                    {
+                        Console.WriteLine("What kind of value would you like from this element?");
+                        Console.WriteLine("1.Voltage (Volts) \n2.Current (Amps) \n3.Resistance(Ohms)");
+                        string elementValueType = Console.ReadLine();
+                        switch(elementValueType)
+                        {
+                            case "1": // Get Voltage across element
+                                break;
+                            case "2": // Get current through element
+                                break;
+                            case "3":
+                                float elementValue = elementList[elementChoice-1].GetImpedance();
+                                if (elementType == "Inductor" || elementType == "Capacitor")
+                                {   
+                                    if (elementValue < 0)
+                                    {
+                                        Console.WriteLine("-j" + Math.Abs(elementValue) + " Ω");
+                                    }
+                                    else
+                                    {
+                                        Console.WriteLine("j" + elementValue + " Ω");
+                                    }
+                                }
+                                else
+                                {
+                                    Console.WriteLine(elementList[elementChoice-1].GetResistance()+ " Ω");
+                                }
+                                break;
+                            default:
+                                Console.WriteLine("Please enter a number between 1 and 3");
+                                break;
+                        }
+
+                    }
                     Console.WriteLine("Find Value");
                     break;
 
@@ -278,9 +437,20 @@ class Program
             }
 
         }
+    
 
+
+
+
+
+        // Methods
         void DisplayElements()
         {   
+            Console.WriteLine("Current Elements: ");
+            if (elementList.Count == 0)
+            {
+                Console.WriteLine("No elements have been added yet.");
+            }
             List<Element> sortedList = elementList.OrderBy(o=>o.GetElementType()).ToList();
             elementList = sortedList;
             int counter = 1;
@@ -292,9 +462,108 @@ class Program
             }
         }
 
+        void SetFrequency()
+        {
+            if (_frequencySet == false)
+            {
+                Console.Write("What is the frequency of the circuit in Radians/sec?: ");
+                int frequency = int.Parse(Console.ReadLine());
+                _frequency = frequency;
+                _frequencySet = true;
+            }
+        }
+
+        void DisplayConnections(List<Tuple<string, float, float, bool?>> existingConnection)
+        {
+            Console.WriteLine("Current Connections: ");
+            if (elementConnections.Count() == 0)
+            {
+                Console.WriteLine("No connections have been made yet.");
+            }
+            int counter = 0;
+            foreach (KeyValuePair<string, List<Tuple<string, float, float, bool?>>> kvp in elementConnections)
+            {
+                Console.Write(counter + 1 + ". ");
+                int listCounter = 0;
+                foreach(Tuple<string, float, float, bool?> item in kvp.Value)
+                {
+                    string positive;
+                    if (kvp.Value[listCounter].Item4 == true)
+                    {
+                        positive = "+";
+                    }
+                    else if (kvp.Value[listCounter].Item4 == false)
+                    {
+                        positive = "-";
+                    }
+                    else
+                    {
+                        positive = "";
+                    }
+
+                    if(listCounter == 0)
+                    {                
+                    Console.Write(kvp.Key + " : (" + positive + kvp.Value[0].Item1);
+                    }
+                    else
+                    {
+                        Console.Write(" <-> " + positive + kvp.Value[listCounter].Item1);
+                    }
+
+                    listCounter += 1;
+                }
+                counter += 1; 
+
+                Console.WriteLine(")");
+
+     
+            }
 
 
-        // Methods
+        }
+
+        void ConnectSourceToElement(Element source, Element element)    // Connect Source to Element
+        {
+            string connectionName = source.GetType() + " to " + element.GetType();
+            Tuple<string, float, float, bool?> sourceDetails = new Tuple<string, float, float, bool?>(source.GetName(), source.GetValue(), source.GetPhaseAngle(), source.GetPositiveTerminal());
+            Tuple<string, float, float, bool?> elementDetails = new Tuple<string, float, float, bool?>(element.GetName(), element.GetResistance(), element.GetImaginaryResistance(), element.GetPositiveTerminal());
+            List<Tuple<string, float, float, bool?>> detailsList = new List<Tuple<string, float, float, bool?>>
+            {
+                sourceDetails,
+                elementDetails
+            };
+            elementConnections.Add(connectionName, detailsList);
+            Console.WriteLine("Connect Source to Element");
+        }
+
+        void ConnectSourceToSource(Element source1, Element source2) // Connect Source to Source
+        {
+            string connectionName = source1.GetType() + " to " + source2.GetType();
+            Tuple<string, float, float, bool?> source1Details = new Tuple<string, float, float, bool?>(source1.GetName(), source1.GetValue(), source1.GetPhaseAngle(), source1.GetPositiveTerminal());
+            Tuple<string, float, float, bool?> source2Details = new Tuple<string, float, float, bool?>(source2.GetName(), source2.GetValue(), source2.GetPhaseAngle(), source2.GetPositiveTerminal());
+            List<Tuple<string, float, float, bool?>> detailsList = new List<Tuple<string, float, float, bool?>>
+            {
+                source1Details,
+                source2Details
+            };
+            elementConnections.Add(connectionName, detailsList);
+            Console.WriteLine("Connect Source to Source");    
+        }
+
+        void ConnectElementToElement(Element element1, Element element2) // Connect Element to Element
+        {
+            string connectionName = element1.GetType() + " to " + element2.GetType();
+            Tuple<string, float, float, bool?> element1Details = new Tuple<string, float, float, bool?>(element1.GetName(), element1.GetValue(), element1.GetPhaseAngle(), element1.GetPositiveTerminal());
+            Tuple<string, float, float, bool?> element2Details = new Tuple<string, float, float, bool?>(element2.GetName(), element2.GetValue(), element2.GetPhaseAngle(), element2.GetPositiveTerminal());
+            List<Tuple<string, float, float, bool?>> detailsList = new List<Tuple<string, float, float, bool?>>
+            {
+                element1Details,
+                element2Details
+            };
+            elementConnections.Add(connectionName, detailsList);
+            Console.WriteLine("Connect Element to Element");
+        }
+
         void DisplaySpinner(int time)
         {
             _startSpinner = DateTime.Now;

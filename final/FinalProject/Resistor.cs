@@ -1,7 +1,7 @@
 public class Resistor : Element{
 
 
-    public Resistor(string name, int realResistance) : base(name)
+    public Resistor(string name, float realResistance) : base(name)
     {
         _realResistance = realResistance;
         _Type = "Resistor";
@@ -15,4 +15,10 @@ public class Resistor : Element{
     }
 
     public override void SetPositiveTerminal(bool positiveTerminal){}
+    
+    public override bool? GetPositiveTerminal()
+    {
+        return null;
+    }
+
 }

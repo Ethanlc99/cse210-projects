@@ -1,7 +1,7 @@
 public class DC_Current : Current
 {
     // Constructors
-    public DC_Current(string name, int current) : base(name, current)
+    public DC_Current(string name, float current) : base(name, current)
     {
         _elementType = "DC Current Source";
         _phaseAngle = 0;

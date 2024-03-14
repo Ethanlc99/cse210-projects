@@ -1,14 +1,17 @@
 public abstract class Element
 {
     // Member Variables
-    protected int _voltage;
-    protected int _current;
-    protected int _value;
-    protected int _realResistance;
-    protected int _imaginaryResistance;
+    protected float _voltage;
+    protected float _current;
+    protected float _value;
+    protected float _realResistance;
+    protected float _imaginaryResistance;
     protected string _name;
     protected bool _isResistanceReal;
-    protected int _phaseAngle;
+    protected float _phaseAngle;
+    protected float _impedance;
+    protected bool? _positiveTerminal;
+
     protected string _Type;
 
     // Constructor
@@ -16,11 +19,11 @@ public abstract class Element
     {
         _name = name;
     }
-    public Element(string name, int value){
+    public Element(string name, float value){
         _name = name;
         _value = value;
     }
-    public Element(int voltage, int current, int value)
+    public Element(float voltage, float current, float value)
     {
         _voltage = voltage;
         _current = current;
@@ -41,7 +44,7 @@ public abstract class Element
     {
         _realResistance = realResistance;
     }
-    public int GetResistance()
+    public float GetResistance()
     {
         return _realResistance;
     }
@@ -50,7 +53,7 @@ public abstract class Element
     {
         _value = value;
     }
-    public int GetValue()
+    public float GetValue()
     {
         return _value;
     }
@@ -59,7 +62,7 @@ public abstract class Element
     {
         _voltage = voltage;
     }
-    public int GetVoltage()
+    public float GetVoltage()
     {
         return _voltage;
     }
@@ -68,7 +71,7 @@ public abstract class Element
     {
         _current = current;
     }
-    public int GetCurrent()
+    public float GetCurrent()
     {
         return _current;
     }
@@ -82,16 +85,37 @@ public abstract class Element
         return _name;
     }
 
+    public float GetPhaseAngle()
+    {
+        return _phaseAngle;
+    }
+
     public void SetElementType(string type)
     {
         _Type = type;
     }
+    public virtual void SetImpedance(int frequency)
+    {}
+
+    public virtual float GetImpedance()
+    {
+        return _impedance;
+    }
+
+    public abstract void SetPositiveTerminal(bool positiveTerminal);
+
+    public abstract bool? GetPositiveTerminal();
+
+    public float GetImaginaryResistance()
+    {
+        return _imaginaryResistance;
+    }
+
     public virtual string GetElementType()
     {
         return _Type;
     }
 
-    public abstract void SetPositiveTerminal(bool positiveTerminal);
 
     // Methods
     public abstract void DisplayElement();

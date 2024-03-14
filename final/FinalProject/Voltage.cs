@@ -1,11 +1,11 @@
 public abstract class Voltage : Element
 {
     // Member Variables
-    protected bool _positiveTerminal;
+    protected bool _positiveTerminalSource;
     protected string _elementType;
     
     // Constructors
-    public Voltage(string name, int voltage) : base(name, voltage)
+    public Voltage(string name, float voltage) : base(name, voltage)
     {
         _voltage = voltage;
     }
@@ -18,7 +18,12 @@ public abstract class Voltage : Element
 
     public override void SetPositiveTerminal(bool positiveTerminal)
     {
-        _positiveTerminal = positiveTerminal;
+        _positiveTerminalSource = positiveTerminal;
+    }
+
+    public override bool? GetPositiveTerminal()
+    {
+        return _positiveTerminalSource;
     }
 
     public override string GetElementType()

@@ -1,10 +1,10 @@
 public abstract class Current : Element
 {
 
-    protected bool _positiveTerminal;
+    protected bool _positiveTerminalSource;
     protected string _elementType;
     // Constructors
-    public Current(string name, int current) : base(name)
+    public Current(string name, float current) : base(name)
     {
         _current = current;
     }
@@ -15,7 +15,12 @@ public abstract class Current : Element
 
     public override void SetPositiveTerminal(bool positiveTerminal)
     {
-        _positiveTerminal = positiveTerminal;
+        _positiveTerminalSource = positiveTerminal;
+    }
+
+    public override bool? GetPositiveTerminal()
+    {
+        return _positiveTerminalSource;
     }
 
     public override string GetElementType()

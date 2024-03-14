@@ -1,7 +1,7 @@
 public class AC_Current : Current
 {
     // Constructor
-    public AC_Current(string name, int current, int phaseAngle) : base(name, current)
+    public AC_Current(string name, float current, float phaseAngle) : base(name, current)
     {
         _phaseAngle = phaseAngle;
         _elementType = "AC Current Source";

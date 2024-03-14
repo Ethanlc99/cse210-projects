@@ -1,7 +1,7 @@
 public class AC_Voltage : Voltage
 {
     // Constructors
-    public AC_Voltage(string name, int voltage, int phaseAngle) : base(name, voltage)
+    public AC_Voltage(string name, float voltage, float phaseAngle) : base(name, voltage)
     {
         _phaseAngle = phaseAngle;
         _elementType = "AC Voltage Source";
