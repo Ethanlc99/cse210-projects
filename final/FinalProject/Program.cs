@@ -1,4 +1,5 @@
 using System;
+using System.Data;
 using System.Diagnostics;
 
 
@@ -98,7 +99,7 @@ class Program
                                 break;
                             case 2:
                                 Console.Clear();
-                                DisplayConnections(existingConnection: null);
+                                DisplayAllConnections();
                                 viewElements = true;
                                 // DisplaySpinner(5);
                                 break;
@@ -280,7 +281,7 @@ class Program
 
                 case 4: // Connect elements and sources
                     DisplayElements();
-                    DisplayConnections(existingConnection: null);
+                    DisplayAllConnections();
                     bool pass = false;
                     int userChoiceConnecting = 0;
                     while(!pass)
@@ -369,6 +370,50 @@ class Program
                     else if (userChoiceConnecting == 2)
                     {
                         // TODO: Add function that will allow user to connect a single element to an existing connection
+
+
+                        Console.Clear();
+                        DisplayAllConnections();
+                        Console.Write("Which connection would you like to add to?: ");
+                        int connectionChoice = int.Parse(Console.ReadLine());
+                        KeyValuePair<string, List<Tuple<string, float, float, bool?>>> chosenConnection = elementConnections.ElementAt(connectionChoice-1);
+                        DisplayElements();
+                        Console.Write($"Which element would you like to add to this connection - ");
+                        DisplaySingleConnection(chosenConnection);
+                        Console.WriteLine(")?:");
+                        int elementConnectionChoice = int.Parse(Console.ReadLine());
+                        string chosenElement = elementList[elementConnectionChoice-1].GetElementType();
+
+
+                        // if (elementConnections.Value.Item1)
+                        // {
+                        //     Console.Clear();
+                        //     Console.WriteLine("Sorry, this program does not permit connecting an element to itself");
+                        //     break;
+                        // }
+
+
+
+                        if(chosenElement == "Resistor" || chosenElement == "Inductor" || chosenElement == "Capacitor")
+                        {
+                            AddElementToConnection(chosenConnection, elementList[elementConnectionChoice-1]);
+                        }
+                        else
+                        {
+                            Console.Write($"Are you connecting the positive terminal of {elementList[elementConnectionChoice-1].GetName()} to ");
+                            DisplaySingleConnection(chosenConnection); 
+                            Console.Write(")? [y/n]: ");
+                            string positiveTerminal = Console.ReadLine();
+                            if (positiveTerminal == "y" || positiveTerminal == "Y")
+                            {
+                                elementList[elementConnectionChoice-1].SetPositiveTerminal(true);
+                            }
+                            else
+                            {
+                                elementList[elementConnectionChoice-1].SetPositiveTerminal(false);
+                            }
+                            AddSourceToConnection(chosenConnection, elementList[elementConnectionChoice-1]);
+                        }
                     }
 
 
@@ -473,7 +518,7 @@ class Program
             }
         }
 
-        void DisplayConnections(List<Tuple<string, float, float, bool?>> existingConnection)
+        void DisplayAllConnections()
         {
             Console.WriteLine("Current Connections: ");
             if (elementConnections.Count() == 0)
@@ -484,34 +529,37 @@ class Program
             foreach (KeyValuePair<string, List<Tuple<string, float, float, bool?>>> kvp in elementConnections)
             {
                 Console.Write(counter + 1 + ". ");
-                int listCounter = 0;
-                foreach(Tuple<string, float, float, bool?> item in kvp.Value)
-                {
-                    string positive;
-                    if (kvp.Value[listCounter].Item4 == true)
-                    {
-                        positive = "+";
-                    }
-                    else if (kvp.Value[listCounter].Item4 == false)
-                    {
-                        positive = "-";
-                    }
-                    else
-                    {
-                        positive = "";
-                    }
 
-                    if(listCounter == 0)
-                    {                
-                    Console.Write(kvp.Key + " : (" + positive + kvp.Value[0].Item1);
-                    }
-                    else
-                    {
-                        Console.Write(" <-> " + positive + kvp.Value[listCounter].Item1);
-                    }
+                DisplaySingleConnection(kvp);
 
-                    listCounter += 1;
-                }
+                // int listCounter = 0;
+                // foreach(Tuple<string, float, float, bool?> item in kvp.Value)
+                // {
+                //     // string positive;
+                //     // if (kvp.Value[listCounter].Item4 == true)
+                //     // {
+                //     //     positive = "+";
+                //     // }
+                //     // else if (kvp.Value[listCounter].Item4 == false)
+                //     // {
+                //     //     positive = "-";
+                //     // }
+                //     // else
+                //     // {
+                //     //     positive = "";
+                //     // }
+
+                //     if(listCounter == 0)
+                //     {                
+                //         Console.Write(kvp.Key + " : (" + kvp.Value[0].Item1);
+                //     }
+                //     else
+                //     {
+                //         Console.Write(" <-> " + kvp.Value[listCounter].Item1);
+                //     }
+
+                //     listCounter += 1;
+                // }
                 counter += 1; 
 
                 Console.WriteLine(")");
@@ -522,11 +570,48 @@ class Program
 
         }
 
+        void DisplaySingleConnection(KeyValuePair<string, List<Tuple<string, float, float, bool?>>> kvp)
+        {
+            // KeyValuePair<string, List<Tuple<string, float, float, bool?>>> kvp = elementConnections.FirstOrDefault(x => x.Key == key);
+            int listCounter = 0;
+                foreach(Tuple<string, float, float, bool?> item in kvp.Value)
+                {
+                    if(listCounter == 0)
+                    {                
+                        Console.Write(kvp.Key + " : (" + kvp.Value[0].Item1);
+                    }
+                    else
+                    {
+                        Console.Write(" <-> " + kvp.Value[listCounter].Item1);
+                    }
+
+                    listCounter += 1;
+                }
+        }
+
+        // string SetPositiveSide(bool? positive, string name)
+        // {
+        //     if (positive == true)
+        //     {
+        //         return "+" + name;
+        //     }
+        //     else if (positive == false)
+        //     {
+        //         return "-" + name;
+        //     }
+        //     else
+        //     {
+        //         return name;
+        //     }
+        // }
+
         void ConnectSourceToElement(Element source, Element element)    // Connect Source to Element
         {
-            string connectionName = source.GetType() + " to " + element.GetType();
-            Tuple<string, float, float, bool?> sourceDetails = new Tuple<string, float, float, bool?>(source.GetName(), source.GetValue(), source.GetPhaseAngle(), source.GetPositiveTerminal());
-            Tuple<string, float, float, bool?> elementDetails = new Tuple<string, float, float, bool?>(element.GetName(), element.GetResistance(), element.GetImaginaryResistance(), element.GetPositiveTerminal());
+            string connectionName = source.GetType() + "-" + element.GetType();
+            // source.SetPositiveSide(source.GetPositiveTerminal(), source.GetName());
+            // element.SetPositiveSide(element.GetPositiveTerminal(), element.GetName());
+            Tuple<string, float, float, bool?> sourceDetails = new Tuple<string, float, float, bool?>(source.GetPositiveSide(source.GetPositiveTerminal(), source.GetName()), source.GetValue(), source.GetPhaseAngle(), source.GetPositiveTerminal());
+            Tuple<string, float, float, bool?> elementDetails = new Tuple<string, float, float, bool?>(element.GetPositiveSide(element.GetPositiveTerminal(), element.GetName()), element.GetResistance(), element.GetImaginaryResistance(), element.GetPositiveTerminal());
             List<Tuple<string, float, float, bool?>> detailsList = new List<Tuple<string, float, float, bool?>>
             {
                 sourceDetails,
@@ -538,9 +623,9 @@ class Program
 
         void ConnectSourceToSource(Element source1, Element source2) // Connect Source to Source
         {
-            string connectionName = source1.GetType() + " to " + source2.GetType();
-            Tuple<string, float, float, bool?> source1Details = new Tuple<string, float, float, bool?>(source1.GetName(), source1.GetValue(), source1.GetPhaseAngle(), source1.GetPositiveTerminal());
-            Tuple<string, float, float, bool?> source2Details = new Tuple<string, float, float, bool?>(source2.GetName(), source2.GetValue(), source2.GetPhaseAngle(), source2.GetPositiveTerminal());
+            string connectionName = source1.GetType() + "-" + source2.GetType();
+            Tuple<string, float, float, bool?> source1Details = new Tuple<string, float, float, bool?>(source1.GetPositiveSide(source1.GetPositiveTerminal(), source1.GetName()), source1.GetValue(), source1.GetPhaseAngle(), source1.GetPositiveTerminal());
+            Tuple<string, float, float, bool?> source2Details = new Tuple<string, float, float, bool?>(source2.GetPositiveSide(source2.GetPositiveTerminal(), source2.GetName()), source2.GetValue(), source2.GetPhaseAngle(), source2.GetPositiveTerminal());
             List<Tuple<string, float, float, bool?>> detailsList = new List<Tuple<string, float, float, bool?>>
             {
                 source1Details,
@@ -552,9 +637,9 @@ class Program
 
         void ConnectElementToElement(Element element1, Element element2) // Connect Element to Element
         {
-            string connectionName = element1.GetType() + " to " + element2.GetType();
-            Tuple<string, float, float, bool?> element1Details = new Tuple<string, float, float, bool?>(element1.GetName(), element1.GetValue(), element1.GetPhaseAngle(), element1.GetPositiveTerminal());
-            Tuple<string, float, float, bool?> element2Details = new Tuple<string, float, float, bool?>(element2.GetName(), element2.GetValue(), element2.GetPhaseAngle(), element2.GetPositiveTerminal());
+            string connectionName = element1.GetType() + "-" + element2.GetType();
+            Tuple<string, float, float, bool?> element1Details = new Tuple<string, float, float, bool?>(element1.GetPositiveSide(element1.GetPositiveTerminal(), element1.GetName()), element1.GetValue(), element1.GetPhaseAngle(), element1.GetPositiveTerminal());
+            Tuple<string, float, float, bool?> element2Details = new Tuple<string, float, float, bool?>(element2.GetPositiveSide(element2.GetPositiveTerminal(), element2.GetName()), element2.GetValue(), element2.GetPhaseAngle(), element2.GetPositiveTerminal());
             List<Tuple<string, float, float, bool?>> detailsList = new List<Tuple<string, float, float, bool?>>
             {
                 element1Details,
@@ -562,6 +647,23 @@ class Program
             };
             elementConnections.Add(connectionName, detailsList);
             Console.WriteLine("Connect Element to Element");
+        }
+
+        void AddSourceToConnection(KeyValuePair<string, List<Tuple<string, float, float, bool?>>> kvp, Element source)
+        {
+            List<Tuple<string, float, float, bool?>> existingConnection = kvp.Value;
+            string connectionName = kvp.Key + "-" + source.GetType();
+
+            Tuple<string, float, float, bool?> sourceDetails = new Tuple<string, float, float, bool?>(source.GetPositiveSide(source.GetPositiveTerminal(), source.GetName()), source.GetValue(), source.GetPhaseAngle(), source.GetPositiveTerminal());
+            existingConnection.Add(sourceDetails);
+            elementConnections.Remove(kvp.Key);
+            elementConnections[connectionName] = existingConnection;
+
+        }
+
+        void AddElementToConnection(KeyValuePair<string, List<Tuple<string, float, float, bool?>>> kvp, Element element)
+        {
+            Console.WriteLine(kvp.Key);
         }
 
         void DisplaySpinner(int time)

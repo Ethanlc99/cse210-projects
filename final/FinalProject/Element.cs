@@ -102,6 +102,19 @@ public abstract class Element
         return _impedance;
     }
 
+    public string GetPositiveSide(bool? positive, string name)
+    {
+            if (positive == true)
+            {
+                return  "+" + name;
+            }
+            else if (positive == false)
+            {
+                return "-" + name;
+            }
+            else return name;
+    }
+
     public abstract void SetPositiveTerminal(bool positiveTerminal);
 
     public abstract bool? GetPositiveTerminal();
