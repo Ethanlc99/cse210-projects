@@ -4,7 +4,7 @@ using System.Diagnostics;
 
 
 
-// TODO: Add feature to case 4 that allows user to add element to existing connection. Add feature that calculates values (Thevinin and Norton, parrallel impedance). 
+// TODO: TODO: find values of Impedance and resistance across series and parallel elements. Start with Resistors -> capacitors and inductors. Then move on to sources and find voltage across Resistors -> inductors and capacitors. Add feature that calculates values (Thevinin and Norton, parrallel impedance). 
 // Future : Add feature that shows circuit in schematic form.
 
 
