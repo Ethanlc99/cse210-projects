@@ -132,4 +132,22 @@ public abstract class Element
 
     // Methods
     public abstract void DisplayElement();
+
+    public string CalculateVoltage(Element element, Dictionary<string, List<Tuple<string, float, float, bool?>>> connections)
+    {
+        
+        
+
+        return $"{_voltage}";
+    }
+
+    public string CalculateCurrent()
+    {
+        return $"{_current}";
+    }
+
+    public string CalculateImpedance()
+    {
+        return $"{_impedance}";
+    }
 }
