@@ -24,7 +24,14 @@ class Program
         // Dict that hold values a such: 
         // string Element_ConnectedElement : 
         // ([string ElementName, int (Value of Voltage Current or real Resistance], int [Value of Voltage or Current Phase Shift or imaginary part of resistance/impedance], bool [true if positive terminal, false if negative terminal, null if n/a]), 
-        Dictionary<string, List<Tuple<string, float, float, bool?>>> elementConnections = new Dictionary<string, List<Tuple<string, float, float, bool?>>>();
+        
+        Connections elementConnections = new Connections();
+        
+        
+        
+        // Dictionary<string, List<Tuple<string, float, float, bool?>>> elementConnections = new Dictionary<string, List<Tuple<string, float, float, bool?>>>();
+
+
 
         // Connections elementConnections = new Connections();
 
@@ -119,7 +126,7 @@ class Program
                                 break;
                             case 2:
                                 Console.Clear();
-                                DisplayAllConnections();
+                                elementConnections.DisplayAllConnections();
                                 viewElements = true;
                                 // DisplaySpinner(5);
                                 Console.WriteLine("Press any key to continue...");
@@ -356,7 +363,7 @@ class Program
                 case 4: // Connect elements and sources
                     Console.Clear();
                     DisplayElements();
-                    DisplayAllConnections();
+                    elementConnections.DisplayAllConnections();
 
                     // Loop that makes sure that the user either create or adds to a connection, or goes back to main menu
                     bool pass = false;
@@ -443,79 +450,89 @@ class Program
                         // Runs proper function to connect elements/sources
                         if (element1IsSource == true && element2IsSource == true)
                         {
-                            ConnectSourceToSource(elementList[element1-1], elementList[element2-1]);
-                            DisplayAllConnections();
+                            elementConnections.ConnectSourceToSource(elementList[element1-1], elementList[element2-1]);
+                            elementConnections.DisplayAllConnections();
                         }
                         else if (element1IsSource == true && element2IsSource == false)
                         {
-                            ConnectSourceToElement(elementList[element1-1], elementList[element2-1]);
-                            DisplayAllConnections();
+                            elementConnections.ConnectSourceToElement(elementList[element1-1], elementList[element2-1]);
+                            elementConnections.DisplayAllConnections();
                         }
                         else if (element1IsSource == false && element2IsSource == true)
                         {
-                            ConnectSourceToElement(elementList[element2-1], elementList[element1-1]);
-                            DisplayAllConnections();
+                            elementConnections.ConnectSourceToElement(elementList[element2-1], elementList[element1-1]);
+                            elementConnections.DisplayAllConnections();
                         }
                         else
                         {
-                            ConnectElementToElement(elementList[element1-1], elementList[element2-1]);
-                            DisplayAllConnections();
+                            elementConnections.ConnectElementToElement(elementList[element1-1], elementList[element2-1]);
+                            elementConnections.DisplayAllConnections();
                         }
                     }
                     else if (userChoiceConnecting == 2)
                     {
                         Console.Clear();
+                        Console.WriteLine("This feature is not yet useable. Once we are able to analyze multiple loops/meshes we will reenable this feature. Thank you for your patience.");
 
-                        // Shows Current Connections and prompts User which connection they would like to add to
-                        DisplayAllConnections();
-                        Console.Write("Which connection would you like to add to?: ");
-                        int connectionChoice = int.Parse(Console.ReadLine());
-                        KeyValuePair<string, List<Tuple<string, float, float, bool?>>> chosenConnection = elementConnections.ElementAt(connectionChoice-1);
+        //     // Implementation that has been disabled until we can analyze multiple loops/meshes
+        //     // Shows Current Connections and prompts User which connection they would like to add to
+        //     elementConnections.DisplayAllConnections();
+        //     if (elementConnections.GetElementConnections().Count() == 0)
+        //     {
+        //         // DisplaySpinner(5);
+        //         Console.WriteLine("Press any key to continue...");
+        //         Console.ReadKey();
+        //         break;
+        //     }
+        //     Console.Write("Which connection would you like to add to?: ");
+        //     int connectionChoice = int.Parse(Console.ReadLine());
+        //     KeyValuePair<string, List<Tuple<string, float, float, bool?>>> chosenConnection = elementConnections.GetConnection(connectionChoice);
 
-                        // Shows all elements and prompts user which element they would like to add to chosen connection
-                        DisplayElements();
-                        Console.Write($"Which element would you like to add to this connection - ");
-                        DisplaySingleConnection(chosenConnection);
-                        Console.WriteLine(")?:");
-                        int elementConnectionChoice = int.Parse(Console.ReadLine());
-                        string chosenElement = elementList[elementConnectionChoice-1].GetElementType();
+        //     // Shows all elements and prompts user which element they would like to add to chosen connection
+        //     DisplayElements();
+        //     Console.Write($"Which element would you like to add to this connection - ");
+        //     elementConnections.DisplaySingleConnection(chosenConnection);
+        //     Console.WriteLine(")?:");
+        //     int elementConnectionChoice = int.Parse(Console.ReadLine());
+        //     string chosenElement = elementList[elementConnectionChoice-1].GetElementType();
 
-                        // Makes sure that user doesn't connect an element to itself
-                        foreach(Tuple<string, float, float, bool?> element in chosenConnection.Value)
-                        {
-                            if (element.Item1 == elementList[elementConnectionChoice-1].GetName())
-                            {
-                                Console.Clear();
-                                Console.WriteLine("Sorry, this program does not permit connecting a single element to a connection twice.");
-                                // DisplaySpinner(5);
-                                Console.WriteLine("Press any key to continue...");
-                                Console.ReadKey();
-                                break;
-                            }
-                        }
+        //     // Makes sure that user doesn't connect an element to itself
+        //     foreach(Tuple<string, float, float, bool?> element in chosenConnection.Value)
+        //     {
+        //         if (element.Item1 == elementList[elementConnectionChoice-1].GetName())
+        //         {
+        //             Console.Clear();
+        //             Console.WriteLine("Sorry, this program does not permit connecting a single element to a connection twice.");
+        //             // DisplaySpinner(5);
+        //             Console.WriteLine("Press any key to continue...");
+        //             Console.ReadKey();
+        //             break;
+        //         }
+        //     }
 
-                        // Adds element to chosen connection
-                        if(chosenElement == "Resistor" || chosenElement == "Inductor" || chosenElement == "Capacitor")
-                        {
-                            AddElementToConnection(chosenConnection, elementList[elementConnectionChoice-1]);
-                        }
-                        else
-                        {
-                            // Sets the positive terminal of the source
-                            Console.Write($"Are you connecting the positive terminal of {elementList[elementConnectionChoice-1].GetName()} to ");
-                            DisplaySingleConnection(chosenConnection); 
-                            Console.Write(")? [y/n]: ");
-                            string positiveTerminal = Console.ReadLine();
-                            if (positiveTerminal == "y" || positiveTerminal == "Y")
-                            {
-                                elementList[elementConnectionChoice-1].SetPositiveTerminal(true);
-                            }
-                            else
-                            {
-                                elementList[elementConnectionChoice-1].SetPositiveTerminal(false);
-                            }
-                            AddSourceToConnection(chosenConnection, elementList[elementConnectionChoice-1]);
-                        }
+        //     // Adds element to chosen connection
+        //     if(chosenElement == "Resistor" || chosenElement == "Inductor" || chosenElement == "Capacitor")
+        //     {
+        //         elementConnections.AddElementToConnection(chosenConnection, elementList[elementConnectionChoice-1]);
+        //     }
+        //     else
+        //     {
+        //         // Sets the positive terminal of the source
+        //         Console.Write($"Are you connecting the positive terminal of {elementList[elementConnectionChoice-1].GetName()} to ");
+        //         elementConnections.DisplaySingleConnection(chosenConnection); 
+        //         Console.Write(")? [y/n]: ");
+        //         string positiveTerminal = Console.ReadLine();
+        //         if (positiveTerminal == "y" || positiveTerminal == "Y")
+        //         {
+        //             elementList[elementConnectionChoice-1].SetPositiveTerminal(true);
+        //         }
+        //         else
+        //         {
+        //             elementList[elementConnectionChoice-1].SetPositiveTerminal(false);
+        //         }
+        //         elementConnections.AddSourceToConnection(chosenConnection, elementList[elementConnectionChoice-1]);
+        //     }
+                    
                     }
                     Console.WriteLine("Element has been added! \nPress any key to continue...");
                     Console.ReadKey();
@@ -541,9 +558,12 @@ class Program
                         switch(elementValueType)
                         {
                             case "1": // Get Voltage across element
-                                DisplayAllConnections();
-                                Console.Write("Which Connection contains the positive terminal?: ");
-                                elementChoice = int.Parse(Console.ReadLine());             
+                                elementConnections.DisplayAllConnections();
+                                // Console.Write("Which Connection contains the positive terminal?: ");
+                                // elementChoice = int.Parse(Console.ReadLine());     
+
+
+
 
 // TODO: Calculate Zeq and use voltage divider equation to find voltage across this element. Make sure that there is a complete loop for this to work. If the circuit is not complete, show 0 for voltage and explain that the circuit needs to be complete to find voltage across an element
 
@@ -560,19 +580,31 @@ class Program
                                     if (elementImpedance < 0)
                                     {
                                         Console.WriteLine("-j" + Math.Abs(elementImpedance) + " Ω");
+                                        // DisplaySpinner(5);
+                                        Console.WriteLine("Press any key to continue...");
+                                        Console.ReadKey();
                                     }
                                     else
                                     {
                                         Console.WriteLine("j" + elementImpedance + " Ω");
+                                        // DisplaySpinner(5);
+                                        Console.WriteLine("Press any key to continue...");
+                                        Console.ReadKey();
                                     }
                                 }
                                 else
                                 {
                                     Console.WriteLine(elementList[elementChoice-1].GetResistance()+ " Ω");
+                                    // DisplaySpinner(5);
+                                    Console.WriteLine("Press any key to continue...");
+                                    Console.ReadKey();
                                 }
                                 break;
                             default:
                                 Console.WriteLine("Please enter a number between 1 and 3");
+                                // DisplaySpinner(5);
+                                Console.WriteLine("Press any key to continue...");
+                                Console.ReadKey();
                                 break;
                         }
 
@@ -581,7 +613,7 @@ class Program
                             break;
                         case 2: // analyze multiple elements that are connected 
                             Console.WriteLine("Connections: ");
-                            DisplayAllConnections();
+                            elementConnections.DisplayAllConnections();
 
                             // Prompts the user to declare which elements they want to analyze
                             Console.Write("Which Connections would you like to analyze? (Enter number of connection, separated by commas): ");
@@ -598,7 +630,7 @@ class Program
 
                             int dictCounter = 1;
                             // Iterates through each chosen element and adds element names to a list
-                            foreach (KeyValuePair<string, List<Tuple<string, float, float, bool?>>> kvp in elementConnections)
+                            foreach (KeyValuePair<string, List<Tuple<string, float, float, bool?>>> kvp in elementConnections.GetElementConnections())
                             {
                                 if (connectionChoice.Contains(dictCounter));
                                 {
@@ -621,14 +653,14 @@ class Program
                             List<string> elementNames2 = new List<string>();
                             
                             // Check if connections have been made
-                            if (elementConnections.Count() == 0)
+                            if (elementConnections.GetElementConnections().Count() == 0)
                             {
                                 Console.WriteLine("No connections have been made yet.");
                                 break;
                             }
 
                             // Makes a list of resistive elements in declared connections
-                            foreach (KeyValuePair<string, List<Tuple<string, float, float, bool?>>> item in elementConnections)
+                            foreach (KeyValuePair<string, List<Tuple<string, float, float, bool?>>> item in elementConnections.GetElementConnections())
                             {
                                 foreach (Tuple<string, float, float, bool?> element in item.Value)
                                 {
@@ -658,7 +690,9 @@ class Program
                 //     break;
 
                 case 6:
-                    Console.WriteLine("Thanks for using our program today! \nQuit");
+                    Console.WriteLine("Thanks for using our program today!");
+                    // DisplaySpinner(5);
+                    Console.WriteLine("Program terminated...");
                     break;
 
 
@@ -707,53 +741,54 @@ class Program
             }
         }
 
+
 // TODO: Add to separate class for connections
-        void DisplayAllConnections() // Iterates through all declared connections and displays them with a number associated with each one.
-        {
-            // Checks if any connections have been made
-            Console.WriteLine("Current Connections: ");
-            if (elementConnections.Count() == 0)
-            {
-                Console.WriteLine("No connections have been made yet.");
-            }
+        // void DisplayAllConnections() // Iterates through all declared connections and displays them with a number associated with each one.
+        // {
+        //     // Checks if any connections have been made
+        //     Console.WriteLine("Current Connections: ");
+        //     if (elementConnections.Count() == 0)
+        //     {
+        //         Console.WriteLine("No connections have been made yet.");
+        //     }
 
-            // Iterates through Dict of connections and displays each connection with name of connection and elements involved
-            int counter = 0;
-            foreach (KeyValuePair<string, List<Tuple<string, float, float, bool?>>> kvp in elementConnections)
-            {
-                Console.Write(counter + 1 + ". ");
+        //     // Iterates through Dict of connections and displays each connection with name of connection and elements involved
+        //     int counter = 0;
+        //     foreach (KeyValuePair<string, List<Tuple<string, float, float, bool?>>> kvp in elementConnections)
+        //     {
+        //         Console.Write(counter + 1 + ". ");
 
-                DisplaySingleConnection(kvp);
+        //         DisplaySingleConnection(kvp);
 
-                counter += 1; 
+        //         counter += 1; 
 
-                Console.WriteLine(")");
+        //         Console.WriteLine(")");
 
      
-            }
+        //     }
 
 
-        }
+        // }
 
 // TODO: Add to separate class for connections
-        void DisplaySingleConnection(KeyValuePair<string, List<Tuple<string, float, float, bool?>>> kvp) // Displays name of connection, and all elements who are connected together
-        {
-            // Iterates through List of element details and displays the name of element and the connection name
-            int listCounter = 0;
-                foreach(Tuple<string, float, float, bool?> item in kvp.Value)
-                {
-                    if(listCounter == 0)
-                    {                
-                        Console.Write(kvp.Key + " : (" + kvp.Value[0].Item1);
-                    }
-                    else
-                    {
-                        Console.Write(" <-> " + kvp.Value[listCounter].Item1);
-                    }
+        // void DisplaySingleConnection(KeyValuePair<string, List<Tuple<string, float, float, bool?>>> kvp) // Displays name of connection, and all elements who are connected together
+        // {
+        //     // Iterates through List of element details and displays the name of element and the connection name
+        //     int listCounter = 0;
+        //         foreach(Tuple<string, float, float, bool?> item in kvp.Value)
+        //         {
+        //             if(listCounter == 0)
+        //             {                
+        //                 Console.Write(kvp.Key + " : (" + kvp.Value[0].Item1);
+        //             }
+        //             else
+        //             {
+        //                 Console.Write(" <-> " + kvp.Value[listCounter].Item1);
+        //             }
 
-                    listCounter += 1;
-                }
-        }
+        //             listCounter += 1;
+        //         }
+        // }
 
 
         string CalculateZeq(List<string> elementNames) // Calculates Zeq
@@ -785,122 +820,122 @@ class Program
 
 
 // TODO: Add to separate class for connections
-        void ConnectSourceToElement(Element source, Element element)    // Connect Source to Element
-        {
-            // Makes name based off source and element types
-            string connectionName = source.GetType() + "-" + element.GetType();
+    //    void ConnectSourceToElement(Element source, Element element)    // Connect Source to Element
+    //     {
+    //         // Makes name based off source and element types
+    //         string connectionName = source.GetType() + "-" + element.GetType();
 
-            // Define source and element details
-            Tuple<string, float, float, bool?> sourceDetails = new Tuple<string, float, float, bool?>(source.GetPositiveSide(source.GetPositiveTerminal(), source.GetName()), source.GetValue(), source.GetPhaseAngle(), source.GetPositiveTerminal());
-            Tuple<string, float, float, bool?> elementDetails = new Tuple<string, float, float, bool?>(element.GetPositiveSide(element.GetPositiveTerminal(), element.GetName()), element.GetResistance(), element.GetImaginaryResistance(), element.GetPositiveTerminal());
+    //         // Define source and element details
+    //         Tuple<string, float, float, bool?> sourceDetails = new Tuple<string, float, float, bool?>(source.GetPositiveSide(source.GetPositiveTerminal(), source.GetName()), source.GetValue(), source.GetPhaseAngle(), source.GetPositiveTerminal());
+    //         Tuple<string, float, float, bool?> elementDetails = new Tuple<string, float, float, bool?>(element.GetPositiveSide(element.GetPositiveTerminal(), element.GetName()), element.GetResistance(), element.GetImaginaryResistance(), element.GetPositiveTerminal());
 
-            // Add source and element details to list
-            List<Tuple<string, float, float, bool?>> detailsList = new List<Tuple<string, float, float, bool?>>
-            {
-                sourceDetails,
-                elementDetails
-            };
+    //         // Add source and element details to list
+    //         List<Tuple<string, float, float, bool?>> detailsList = new List<Tuple<string, float, float, bool?>>
+    //         {
+    //             sourceDetails,
+    //             elementDetails
+    //         };
 
-            // Add list to dictionary and adds '*' if the connection name already exists
-            while (elementConnections.Keys.Contains(connectionName))
-            {
-                connectionName += "*";
-            }
-            elementConnections.Add(connectionName, detailsList);    
+    //         // Add list to dictionary and adds '*' if the connection name already exists
+    //         while (elementConnections.Keys.Contains(connectionName))
+    //         {
+    //             connectionName += "*";
+    //         }
+    //         elementConnections.Add(connectionName, detailsList);    
 
-            Console.WriteLine("Connect Source to Element");
-        }
+    //         Console.WriteLine("Connect Source to Element");
+    //     } 
 
 // TODO: Add to separate class for connections
-        void ConnectSourceToSource(Element source1, Element source2) // Connect Source to Source
-        {
-            // Makes name based off sources types
-            string connectionName = source1.GetType() + "-" + source2.GetType();
+        // void ConnectSourceToSource(Element source1, Element source2) // Connect Source to Source
+        // {
+        //     // Makes name based off sources types
+        //     string connectionName = source1.GetType() + "-" + source2.GetType();
 
-            // Define sources details
-            Tuple<string, float, float, bool?> source1Details = new Tuple<string, float, float, bool?>(source1.GetPositiveSide(source1.GetPositiveTerminal(), source1.GetName()), source1.GetValue(), source1.GetPhaseAngle(), source1.GetPositiveTerminal());
-            Tuple<string, float, float, bool?> source2Details = new Tuple<string, float, float, bool?>(source2.GetPositiveSide(source2.GetPositiveTerminal(), source2.GetName()), source2.GetValue(), source2.GetPhaseAngle(), source2.GetPositiveTerminal());
+        //     // Define sources details
+        //     Tuple<string, float, float, bool?> source1Details = new Tuple<string, float, float, bool?>(source1.GetPositiveSide(source1.GetPositiveTerminal(), source1.GetName()), source1.GetValue(), source1.GetPhaseAngle(), source1.GetPositiveTerminal());
+        //     Tuple<string, float, float, bool?> source2Details = new Tuple<string, float, float, bool?>(source2.GetPositiveSide(source2.GetPositiveTerminal(), source2.GetName()), source2.GetValue(), source2.GetPhaseAngle(), source2.GetPositiveTerminal());
 
-            // Add sources details to list
-            List<Tuple<string, float, float, bool?>> detailsList = new List<Tuple<string, float, float, bool?>>
-            {
-                source1Details,
-                source2Details
-            };
+        //     // Add sources details to list
+        //     List<Tuple<string, float, float, bool?>> detailsList = new List<Tuple<string, float, float, bool?>>
+        //     {
+        //         source1Details,
+        //         source2Details
+        //     };
 
-            // Add list to dictionary and adds '*' if the connection name already exists
-            while (elementConnections.Keys.Contains(connectionName))
-            {
-                connectionName += "*";
-            }    
-            elementConnections.Add(connectionName, detailsList);    
+        //     // Add list to dictionary and adds '*' if the connection name already exists
+        //     while (elementConnections.Keys.Contains(connectionName))
+        //     {
+        //         connectionName += "*";
+        //     }    
+        //     elementConnections.Add(connectionName, detailsList);    
 
             
-            Console.WriteLine("Connect Source to Source");    
-        }
+        //     Console.WriteLine("Connect Source to Source");    
+        // }
 
 // TODO: Add to separate class for connections
-        void ConnectElementToElement(Element element1, Element element2) // Connect Element to Element
-        {
-            // Makes name based off elements types
-            string connectionName = element1.GetType() + "-" + element2.GetType();
+        // void ConnectElementToElement(Element element1, Element element2) // Connect Element to Element
+        // {
+        //     // Makes name based off elements types
+        //     string connectionName = element1.GetType() + "-" + element2.GetType();
 
-            // Define elements details
-            Tuple<string, float, float, bool?> element1Details = new Tuple<string, float, float, bool?>(element1.GetPositiveSide(element1.GetPositiveTerminal(), element1.GetName()), element1.GetValue(), element1.GetPhaseAngle(), element1.GetPositiveTerminal());
-            Tuple<string, float, float, bool?> element2Details = new Tuple<string, float, float, bool?>(element2.GetPositiveSide(element2.GetPositiveTerminal(), element2.GetName()), element2.GetValue(), element2.GetPhaseAngle(), element2.GetPositiveTerminal());
+        //     // Define elements details
+        //     Tuple<string, float, float, bool?> element1Details = new Tuple<string, float, float, bool?>(element1.GetPositiveSide(element1.GetPositiveTerminal(), element1.GetName()), element1.GetValue(), element1.GetPhaseAngle(), element1.GetPositiveTerminal());
+        //     Tuple<string, float, float, bool?> element2Details = new Tuple<string, float, float, bool?>(element2.GetPositiveSide(element2.GetPositiveTerminal(), element2.GetName()), element2.GetValue(), element2.GetPhaseAngle(), element2.GetPositiveTerminal());
 
-            // Add elements details to list
-            List<Tuple<string, float, float, bool?>> detailsList = new List<Tuple<string, float, float, bool?>>
-            {
-                element1Details,
-                element2Details
-            };
+        //     // Add elements details to list
+        //     List<Tuple<string, float, float, bool?>> detailsList = new List<Tuple<string, float, float, bool?>>
+        //     {
+        //         element1Details,
+        //         element2Details
+        //     };
 
-            // Add list to dictionary and adds '*' if the connection name already exists
-            while (elementConnections.Keys.Contains(connectionName))
-            {
-                connectionName += "*";
-            }
-            elementConnections.Add(connectionName, detailsList);    
+        //     // Add list to dictionary and adds '*' if the connection name already exists
+        //     while (elementConnections.Keys.Contains(connectionName))
+        //     {
+        //         connectionName += "*";
+        //     }
+        //     elementConnections.Add(connectionName, detailsList);    
 
-            Console.WriteLine("Connect Element to Element");
-        }
-
-// TODO: Add to separate class for connections
-        void AddSourceToConnection(KeyValuePair<string, List<Tuple<string, float, float, bool?>>> kvp, Element source)
-        {
-            // Defines current connection and adds source name to it
-            List<Tuple<string, float, float, bool?>> existingConnection = kvp.Value;
-            string connectionName = kvp.Key + "-" + source.GetType();
-
-            // Define source details
-            Tuple<string, float, float, bool?> sourceDetails = new Tuple<string, float, float, bool?>(source.GetPositiveSide(source.GetPositiveTerminal(), source.GetName()), source.GetValue(), source.GetPhaseAngle(), source.GetPositiveTerminal());
-
-            // Add source details to list
-            existingConnection.Add(sourceDetails);
-
-            // Removes old connection and adds new one that has new source connected
-            elementConnections.Remove(kvp.Key);
-            elementConnections[connectionName] = existingConnection;
-        }
+        //     Console.WriteLine("Connect Element to Element");
+        // }
 
 // TODO: Add to separate class for connections
-        void AddElementToConnection(KeyValuePair<string, List<Tuple<string, float, float, bool?>>> kvp, Element element)
-        {
-            // Defines current connection and adds element name to it
-            List<Tuple<string, float, float, bool?>> existingConnection = kvp.Value;
-            string connectionName = kvp.Key + "-" + element.GetType();
+        // void AddSourceToConnection(KeyValuePair<string, List<Tuple<string, float, float, bool?>>> kvp, Element source)
+        // {
+        //     // Defines current connection and adds source name to it
+        //     List<Tuple<string, float, float, bool?>> existingConnection = kvp.Value;
+        //     string connectionName = kvp.Key + "-" + source.GetType();
 
-            // Define element details
-            Tuple<string, float, float, bool?> elementDetails = new Tuple<string, float, float, bool?>(element.GetPositiveSide(element.GetPositiveTerminal(), element.GetName()), element.GetValue(), element.GetPhaseAngle(), element.GetPositiveTerminal());
+        //     // Define source details
+        //     Tuple<string, float, float, bool?> sourceDetails = new Tuple<string, float, float, bool?>(source.GetPositiveSide(source.GetPositiveTerminal(), source.GetName()), source.GetValue(), source.GetPhaseAngle(), source.GetPositiveTerminal());
 
-            // Add element details to list
-            existingConnection.Add(elementDetails);
+        //     // Add source details to list
+        //     existingConnection.Add(sourceDetails);
 
-            // Removes old connection and adds new one that has new element connected
-            elementConnections.Remove(kvp.Key);
-            elementConnections[connectionName] = existingConnection;
-        }
+        //     // Removes old connection and adds new one that has new source connected
+        //     elementConnections.Remove(kvp.Key);
+        //     elementConnections[connectionName] = existingConnection;
+        // }
+
+// TODO: Add to separate class for connections
+        // void AddElementToConnection(KeyValuePair<string, List<Tuple<string, float, float, bool?>>> kvp, Element element)
+        // {
+        //     // Defines current connection and adds element name to it
+        //     List<Tuple<string, float, float, bool?>> existingConnection = kvp.Value;
+        //     string connectionName = kvp.Key + "-" + element.GetType();
+
+        //     // Define element details
+        //     Tuple<string, float, float, bool?> elementDetails = new Tuple<string, float, float, bool?>(element.GetPositiveSide(element.GetPositiveTerminal(), element.GetName()), element.GetValue(), element.GetPhaseAngle(), element.GetPositiveTerminal());
+
+        //     // Add element details to list
+        //     existingConnection.Add(elementDetails);
+
+        //     // Removes old connection and adds new one that has new element connected
+        //     elementConnections.Remove(kvp.Key);
+        //     elementConnections[connectionName] = existingConnection;
+        // }
 
         void DisplaySpinner(int time) // Displays spinner for a specified time
         {
@@ -934,6 +969,6 @@ class Program
                 Console.Write("\b \b");
             }
 
-    }
+        }
     }
 }
